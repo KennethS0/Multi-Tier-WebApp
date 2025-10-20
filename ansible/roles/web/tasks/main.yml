@@ -1,0 +1,69 @@
+---
+- name: Install prerequisites for apt over HTTPS
+  ansible.builtin.apt:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - apt-transport-https
+    - ca-certificates
+    - curl
+    - software-properties-common
+  
+
+- name: Download NGINX signing key
+  ansible.builtin.get_url:
+    url: https://nginx.org/keys/nginx_signing.key
+    dest: /tmp/nginx_signing.key
+  
+
+- name: Add NGINX signing key
+  ansible.builtin.command: apt-key add /tmp/nginx_signing.key
+  
+
+- name: Add NGINX official repository
+  ansible.builtin.apt_repository:
+    repo: "deb https://nginx.org/packages/{{ ansible_distribution | lower }}/ {{ ansible_distribution_release }} nginx"
+    state: present
+  
+
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: yes
+  
+
+- name: Install latest nginx from official repo
+  ansible.builtin.apt:
+    name: nginx
+    state: latest
+
+- name: Ensure web root exists
+  ansible.builtin.file:
+    path: /var/www/html
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: '0755'
+
+- name: Deploy Custom Index.html
+  ansible.builtin.template:
+    src: index.html.j2
+    dest: /var/www/html/index.html
+    owner: root
+    group: root
+    mode: '0644'
+
+
+- name: Deploy NGINX configuration template
+  ansible.builtin.template:
+    src: nginx.conf.j2
+    dest: /etc/nginx/nginx.conf
+    owner: root
+    group: root
+    mode: '0644'
+
+
+- name: Make sure nginx is running
+  ansible.builtin.service:
+    name: nginx
+    state: started
+    enabled: true

@@ -1,0 +1,6 @@
+---
+- name: Configure App (Python service - Ubuntu)
+  hosts: tag_Tier_App
+  become: true
+  roles:
+    - app

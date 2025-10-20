@@ -1,0 +1,8 @@
+---
+- name: Configure Web Server (Nginx - Ubuntu)
+  hosts: tag_Tier_Web
+  become: true
+  vars_files:
+    - ../vars/development.yml
+  roles:
+    - web
