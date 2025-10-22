@@ -2,5 +2,9 @@
 - name: Configure App (Python service - Ubuntu)
   hosts: tag_Tier_App
   become: true
+  vars_files:
+    - ../vars/envs/development.yml
+    - ../vars/tiers/all.yml
+    - ../vars/tiers/tag_Tier_App.yml
   roles:
     - app

@@ -5,24 +5,22 @@ resource "aws_vpc" "main" {
     enable_dns_hostnames = true
     enable_dns_support = true
     tags = merge(
-        local.tags, 
+        var.additional_tags, 
         { 
-            Name = "${local.name_prefix}-vpc" 
+            Name = "${var.project_prefix}-vpc" 
         }
     )
 }
-
 
 resource "aws_internet_gateway" "igw" {
     vpc_id = aws_vpc.main.id
     tags = merge(
-        local.tags, 
+        var.additional_tags, 
         { 
-            Name = "${local.name_prefix}-igw" 
+            Name = "${var.project_prefix}-igw" 
         }
     )
 }
-
 
 resource "aws_subnet" "public" {
     for_each = { for idx, cidr in var.pub_subnets : idx => { cidr = cidr, az = var.azs[idx] } }
@@ -31,9 +29,9 @@ resource "aws_subnet" "public" {
     availability_zone = each.value.az
     map_public_ip_on_launch = true
     tags = merge(
-        local.tags,
+        var.additional_tags,
         { 
-            Name = "${local.name_prefix}-public-${each.value.az}"
+            Name = "${var.project_prefix}-public-${each.value.az}"
             Tier = "Web" 
         }
     )
@@ -41,14 +39,14 @@ resource "aws_subnet" "public" {
 
 
 resource "aws_subnet" "private" {
-    for_each = { for idx, cidr in var.pri_subnets : idx => { cidr = cidr, az = var.azs[idx] } }
+    for_each = { for idx, cidr in var.priv_subnets : idx => { cidr = cidr, az = var.azs[idx] } }
     vpc_id = aws_vpc.main.id
     cidr_block = each.value.cidr
     availability_zone = each.value.az
     tags = merge(
-        local.tags, 
+        var.additional_tags, 
         { 
-            Name = "${local.name_prefix}-private-${each.value.az}"
+            Name = "${var.project_prefix}-private-${each.value.az}"
             Tier = "App" 
         }
     )
@@ -58,9 +56,9 @@ resource "aws_subnet" "private" {
 resource "aws_route_table" "public" {
     vpc_id = aws_vpc.main.id
     tags = merge(
-        local.tags, 
+        var.additional_tags, 
         { 
-            Name = "${local.name_prefix}-public-rt"
+            Name = "${var.project_prefix}-public-rt"
         }
     )
 }

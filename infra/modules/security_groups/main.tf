@@ -1,7 +1,7 @@
 resource "aws_security_group" "web" {
-    name = "${local.name_prefix}-sg-web"
+    name = "${var.project_prefix}-sg-web"
     description = "Web tier SG"
-    vpc_id = aws_vpc.main.id
+    vpc_id = var.vpc_id
 
     # Allow access from anywhere on port 80 (Browser)
     ingress { 
@@ -11,7 +11,7 @@ resource "aws_security_group" "web" {
         cidr_blocks = ["0.0.0.0/0"] 
     }
 
-    # Allow SSH access from explicit addresses
+    # Allow SSH access from specific addresses
     dynamic "ingress" {
         for_each = var.ssh_ingress_cidr == null ? {} : { ssh = var.ssh_ingress_cidr }
         content {
@@ -23,7 +23,6 @@ resource "aws_security_group" "web" {
         }
     }
 
-
     egress { 
         from_port = 0 
         to_port = 0 
@@ -32,20 +31,21 @@ resource "aws_security_group" "web" {
     }
 
     tags = merge(
-        local.tags, 
+        var.additional_tags, 
         { 
-            Name = "${local.name_prefix}-sg-web", Tier = "Web"
+            Name = "${var.project_prefix}-sg-web",
+            Tier = "Web"
         }
     )
 }
 
 
 resource "aws_security_group" "app" {
-    name = "${local.name_prefix}-sg-app"
+    name = "${var.project_prefix}-sg-app"
     description = "App tier SG"
-    vpc_id = aws_vpc.main.id
+    vpc_id = var.vpc_id
 
-
+    # Allow HTTP requests from Web Server to private app server on port :8080
     ingress {
         description = "App HTTP"
         from_port = 8080
@@ -54,7 +54,7 @@ resource "aws_security_group" "app" {
         security_groups = [aws_security_group.web.id]
     }
 
-
+    # Allow ssh from public web servers to private app servers
     ingress {
         description = "SSH from web"
         from_port = 22
@@ -62,7 +62,6 @@ resource "aws_security_group" "app" {
         protocol = "tcp"
         security_groups = [aws_security_group.web.id]
     }
-
 
     egress { 
         from_port = 0 
@@ -73,20 +72,21 @@ resource "aws_security_group" "app" {
 
 
     tags = merge(
-        local.tags, 
+        var.additional_tags, 
         { 
-            Name = "${local.name_prefix}-sg-app", Tier = "App"
+            Name = "${var.project_prefix}-sg-app",
+            Tier = "App"
         }
     )
 }
 
 
 resource "aws_security_group" "alb" {
-    name = "${local.name_prefix}-sg-alb"
+    name = "${var.project_prefix}-sg-alb"
     description = "ALB SG"
-    vpc_id = aws_vpc.main.id
+    vpc_id = var.vpc_id
 
-
+    # Allow access from any browser
     ingress { 
         from_port = 80 
         to_port = 80 
@@ -102,9 +102,9 @@ resource "aws_security_group" "alb" {
     }
 
     tags = merge(
-        local.tags, 
+        var.additional_tags, 
         { 
-            Name = "${local.name_prefix}-sg-alb"
+            Name = "${var.project_prefix}-sg-alb"
         }
     )
 }

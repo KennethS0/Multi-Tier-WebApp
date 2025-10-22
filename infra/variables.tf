@@ -28,7 +28,7 @@ variable "pub_subnets" {
     default = ["10.0.10.0/24", "10.0.11.0/24"]
 }
 
-variable "pri_subnets" {
+variable "priv_subnets" {
     type = list(string)
     default = ["10.0.20.0/24", "10.0.21.0/24"]
 }
@@ -38,17 +38,17 @@ variable "key_name" {
     default = "BastionHostKey"    
 }
 
-variable "instance_type_web" { 
-    type = string
-    default = "t3.micro"
-}
-
-variable "instance_type_app" {
-    type = string 
-    default = "t3.micro"
-}
-
 variable "ssh_ingress_cidr" { 
-    type = string 
+    type = string
     default = "0.0.0.0/0"
+}
+
+variable "app_servers_ssh_key_name" {
+    type = string
+    default = "BastionHostKey"
+}
+
+variable "web_servers_ssh_key_name" {
+    type = string
+    default = "BastionHostKey"
 }

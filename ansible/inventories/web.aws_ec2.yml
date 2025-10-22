@@ -1,0 +1,15 @@
+plugin: amazon.aws.aws_ec2
+regions: [us-east-2]
+
+filters: 
+  "tag:Tier": "Web"
+  "instance-state-name": "running"
+
+keyed_groups:
+  - key: tags.Tier
+    prefix: tag_Tier_
+    separator: ""
+
+compose:
+  ansible_host: 
+    public_ip_address
