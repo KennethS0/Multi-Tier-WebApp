@@ -39,3 +39,4 @@ terraform.rc
 # Ignore SSH Keys
 *.pem
 *ssh_config*
+*ssh_bastion_to_app*
