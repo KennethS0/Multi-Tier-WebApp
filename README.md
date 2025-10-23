@@ -4,6 +4,12 @@ This Multi-Tier Web Application created in AWS through Terraform and Ansible.
 ## Infra
 This project uses Terraform to generate EC2 instances for different applications. 
 
+This project uses a remote backend state file in an S3 instance with a DynamoDB table to ensure all the developers have access to the same file and to also lock the file to prevent multiple changes to be done at once.
+
+The infra has a VPC with public and private subnets in 2 different availability zones. The infra will support a server for each one of the applications in each availability zones. The `Web` server will be accessible by the public through a browser. The `App` server will only be accessible by being in a `Web` server and through the port 8080. The access is limited by the security groups.
+
+To ensure that both availability zone web servers are being used, a load balancer was also created. The load balancer dns is what users will use to go to the application.
+
 
 ## Ansible
 Once the infraestructure is generated, we can execute ansible to set up the applications. But first we need to generate a SSH configuration file in order to gain access to the private servers through the Bastion Host.
