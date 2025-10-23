@@ -40,4 +40,5 @@ Once in the EC2 instance that is hosting a web application execute the following
 curl <app_private_ip>:8080
 ```
 
-You will see the following output:![Python App Output](images/python_output.png)
+You will see the following output:
+![Python App Output](images/python_output.png)
